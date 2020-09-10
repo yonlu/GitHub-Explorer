@@ -1,5 +1,11 @@
 import React from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { Link, useRouteMatch } from 'react-router-dom';
+
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+
+import logoImg from '../../assets/logo.svg';
+
+import { Header, RepositoryInfo, Issues } from './styles';
 
 interface RepositoryParams {
   repository: string;
@@ -8,7 +14,55 @@ interface RepositoryParams {
 const Repository: React.FC = () => {
   const { params } = useRouteMatch<RepositoryParams>();
 
-  return <h1>Repository:{params.repository}</h1>;
+  return (
+    <>
+      <Header>
+        <img src={logoImg} alt="GitHub Explorer" />
+        <Link to="/">
+          <FiChevronLeft size={16} />
+          Back
+        </Link>
+      </Header>
+
+      <RepositoryInfo>
+        <header>
+          <img
+            src="https://avatars2.githubusercontent.com/u/18669601?s=460&u=a705767b2ca06918c43df751dd761738d1fdc526&v=4"
+            alt="Lucas"
+          />
+          <div>
+            <strong>Rocketseat/unform</strong>
+            <p>Description</p>
+          </div>
+        </header>
+        <ul>
+          <li>
+            <strong>1808</strong>
+            <span>Stars</span>
+          </li>
+          <li>
+            <strong>48</strong>
+            <span>Forks</span>
+          </li>
+          <li>
+            <strong>67</strong>
+            <span>Issues</span>
+          </li>
+        </ul>
+      </RepositoryInfo>
+
+      <Issues>
+        <Link to="asda">
+          <div>
+            <strong>ajksjqwe</strong>
+            <p>akqjwkejq</p>
+          </div>
+
+          <FiChevronRight size={20} />
+        </Link>
+      </Issues>
+    </>
+  );
 };
 
 export default Repository;
