@@ -2,7 +2,7 @@
   "name": "05-primeiro-project-react",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://yonlu.github.io/GitHub-Explorer/",
+  "homepage": "http://yonlu.github.io/GitHub-Explorer",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
