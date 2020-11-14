@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import {
+  GoStar,
+  GoRepoForked,
+  GoIssueOpened,
+  GoChevronLeft,
+  GoChevronRight,
+} from 'react-icons/go';
 import api from '../../services/api';
 
 import logoImg from '../../assets/logo.svg';
@@ -29,6 +35,7 @@ interface Issue {
   html_url: string;
   user: {
     login: string;
+    avatar_url: string;
   };
 }
 
@@ -53,7 +60,7 @@ const Repository: React.FC = () => {
       <Header>
         <img src={logoImg} alt="GitHub Explorer" />
         <Link to="/">
-          <FiChevronLeft size={16} />
+          <GoChevronLeft size={16} />
           Back
         </Link>
       </Header>
@@ -72,14 +79,17 @@ const Repository: React.FC = () => {
           </header>
           <ul>
             <li>
+              <GoStar size={40} />
               <strong>{repository.stargazers_count}</strong>
               <span>Stars</span>
             </li>
             <li>
+              <GoRepoForked size={40} />
               <strong>{repository.forks_count}</strong>
               <span>Forks</span>
             </li>
             <li>
+              <GoIssueOpened size={40} />
               <strong>{repository.open_issues_count}</strong>
               <span>Issues</span>
             </li>
@@ -91,11 +101,17 @@ const Repository: React.FC = () => {
         {issues.map(issue => (
           <a key={issue.id} href={issue.html_url}>
             <div>
+              <img
+                src={issue.user.avatar_url}
+                alt={`${issue.user.login} profile`}
+              />
+            </div>
+            <div>
               <strong>{issue.title}</strong>
               <p>{issue.user.login}</p>
             </div>
 
-            <FiChevronRight size={20} />
+            <GoChevronRight size={20} />
           </a>
         ))}
       </Issues>
