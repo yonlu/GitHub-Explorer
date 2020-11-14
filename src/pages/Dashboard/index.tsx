@@ -1,7 +1,9 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { FiChevronRight } from 'react-icons/fi';
+import { GoChevronRight } from 'react-icons/go';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import api from '../../services/api';
+import 'react-toastify/dist/ReactToastify.css';
 
 import logoImg from '../../assets/logo.svg';
 
@@ -17,6 +19,28 @@ interface Repository {
 }
 
 const Dashboard: React.FC = () => {
+  const notifySuccess = () =>
+    toast.success('Your repository was added to the list!', {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
+  const notifyError = () =>
+    toast.error('Repository not found.', {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
   const [newRepo, setNewRepo] = useState('');
   const [inputError, setInputError] = useState('');
   const [repositories, setRepositories] = useState<Repository[]>(() => {
@@ -27,6 +51,7 @@ const Dashboard: React.FC = () => {
     if (storedRepositories) {
       return JSON.parse(storedRepositories);
     }
+
     return [];
   });
 
@@ -35,6 +60,31 @@ const Dashboard: React.FC = () => {
       '@GitHubExplorer:repositories',
       JSON.stringify(repositories),
     );
+
+    async function setDefaultRepositories(): Promise<void> {
+      const defaultRepositories: Repository[] = [];
+
+      let response = await api.get<Repository>('repos/torvalds/linux');
+      let repository: Repository = response.data;
+
+      defaultRepositories.push(repository);
+
+      response = await api.get<Repository>('repos/nodejs/node');
+      repository = response.data;
+
+      defaultRepositories.push(repository);
+
+      response = await api.get<Repository>('repos/microsoft/typescript');
+      repository = response.data;
+
+      defaultRepositories.push(repository);
+
+      setRepositories(defaultRepositories);
+    }
+
+    if (repositories.length === 0) {
+      setDefaultRepositories();
+    }
   }, [repositories]);
 
   async function handleAddRepository(
@@ -43,25 +93,43 @@ const Dashboard: React.FC = () => {
     event.preventDefault();
 
     if (!newRepo) {
-      setInputError('Enter a repository on this format: author/name');
+      setInputError(
+        'Enter a repository in the following format: user/repository',
+      );
       return;
     }
 
+    let success = true;
     try {
       const response = await api.get<Repository>(`repos/${newRepo}`);
-
       const repository = response.data;
 
       setRepositories([...repositories, repository]);
       setNewRepo('');
       setInputError('');
     } catch (err) {
+      success = false;
+      notifyError();
       setInputError('Failed to find repository');
+    }
+    if (success) {
+      notifySuccess();
     }
   }
 
   return (
     <>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <img src={logoImg} alt="GitHub Explorer" />
       <Title>Explore GitHub repositories</Title>
 
@@ -69,7 +137,7 @@ const Dashboard: React.FC = () => {
         <input
           value={newRepo}
           onChange={e => setNewRepo(e.target.value)}
-          placeholder="Type a repository name here"
+          placeholder="Type a repository name here, for example: facebook/react"
           type="text"
         />
         <button type="submit">Search</button>
@@ -92,7 +160,7 @@ const Dashboard: React.FC = () => {
               <p>{repository.description}</p>
             </div>
 
-            <FiChevronRight size={20} />
+            <GoChevronRight size={20} />
           </Link>
         ))}
       </Repositories>
