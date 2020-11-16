@@ -12,7 +12,7 @@ import Label from '../../components/Label';
 
 import logoImg from '../../assets/logo.svg';
 
-import { Header, RepositoryInfo, Issues } from './styles';
+import { RepositoryContainer, Header, RepositoryInfo, Issues } from './styles';
 
 interface RepositoryParams {
   repository: string;
@@ -63,7 +63,7 @@ const Repository: React.FC = () => {
   }, [params.repository]);
 
   return (
-    <>
+    <RepositoryContainer>
       <Header>
         <img src={logoImg} alt="GitHub Explorer" />
         <Link to="/">
@@ -107,6 +107,7 @@ const Repository: React.FC = () => {
       <Issues>
         {issues.map(issue => (
           <a
+            className="issue"
             key={issue.id}
             href={issue.html_url}
             rel="noopener noreferrer"
@@ -136,7 +137,7 @@ const Repository: React.FC = () => {
           </a>
         ))}
       </Issues>
-    </>
+    </RepositoryContainer>
   );
 };
 

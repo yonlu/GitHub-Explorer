@@ -5,10 +5,12 @@ interface LabelProps {
   backgroundColor: string;
 }
 
-export const LabelContainer = styled.div<LabelProps>`
+export const LabelContainer = styled.section<LabelProps>`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: transparent;
+  margin: 0 5px;
 
   button {
     min-width: 100px;

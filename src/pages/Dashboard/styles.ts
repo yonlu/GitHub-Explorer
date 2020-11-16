@@ -56,7 +56,7 @@ export const Form = styled.form<FormProps>`
     }
   }
 
-  @media only screen and (max-width: 465px) {
+  @media only screen and (max-width: 600px) {
     display: flex;
     flex-direction: column;
 
@@ -66,6 +66,12 @@ export const Form = styled.form<FormProps>`
       font-size: 1rem;
       margin-bottom: 1rem;
       border-radius: 5px;
+
+      ${props =>
+        props.hasError &&
+        css`
+          border-color: #c53030;
+        `}
     }
 
     button {
@@ -134,12 +140,11 @@ export const Repositories = styled.div`
     }
   }
 
-  @media only screen and (max-width: 465px) {
+  @media only screen and (max-width: 600px) {
     margin-top: 1.5rem;
 
     a {
       padding: 0.8rem;
-      width: 90vw;
 
       img {
         width: 2.5rem;
