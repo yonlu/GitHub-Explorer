@@ -62,22 +62,23 @@ const Dashboard: React.FC = () => {
     );
 
     async function setDefaultRepositories(): Promise<void> {
-      const defaultRepositories: Repository[] = [];
+      const { data: repositoryOne } = await api.get<Repository>(
+        'repos/torvalds/linux',
+      );
 
-      let response = await api.get<Repository>('repos/torvalds/linux');
-      let repository: Repository = response.data;
+      const { data: repositoryTwo } = await api.get<Repository>(
+        'repos/nodejs/node',
+      );
 
-      defaultRepositories.push(repository);
+      const { data: repositoryThree } = await api.get<Repository>(
+        'repos/microsoft/typescript',
+      );
 
-      response = await api.get<Repository>('repos/nodejs/node');
-      repository = response.data;
-
-      defaultRepositories.push(repository);
-
-      response = await api.get<Repository>('repos/microsoft/typescript');
-      repository = response.data;
-
-      defaultRepositories.push(repository);
+      const defaultRepositories: Repository[] = [
+        repositoryOne,
+        repositoryTwo,
+        repositoryThree,
+      ];
 
       setRepositories(defaultRepositories);
     }
@@ -137,7 +138,7 @@ const Dashboard: React.FC = () => {
         <input
           value={newRepo}
           onChange={e => setNewRepo(e.target.value)}
-          placeholder="Type a repository name here, for example: facebook/react"
+          placeholder="Enter a repository, e.g., facebook/react"
           type="text"
         />
         <button type="submit">Search</button>

@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+export const RepositoryContainer = styled.div``;
+
 export const Header = styled.header`
   display: flex;
   align-items: center;
@@ -57,6 +59,10 @@ export const RepositoryInfo = styled.section`
     margin-top: 40px;
 
     li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 10px 0;
       & + li {
         margin-left: 80px;
       }
@@ -73,12 +79,45 @@ export const RepositoryInfo = styled.section`
       }
     }
   }
+
+  @media only screen and (max-width: 600px) {
+    header {
+      img {
+        width: 60px;
+        height: 60px;
+      }
+
+      div {
+        strong {
+          font-size: 24px;
+          color: #3d3d4d;
+        }
+
+        p {
+          font-size: 16px;
+          color: #737380;
+          margin-top: 4px;
+        }
+      }
+    }
+
+    ul {
+      display: flex;
+      justify-content: center;
+
+      li {
+        strong {
+          font-size: 18px;
+        }
+      }
+    }
+  }
 `;
 
 export const Issues = styled.div`
   margin-top: 80px;
 
-  a {
+  .issue {
     background: #fff;
     border-radius: 5px;
     width: 100%;
@@ -122,6 +161,34 @@ export const Issues = styled.div`
       border-radius: 50%;
       width: 60px;
       height: 60px;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    a {
+      padding: 12px;
+      display: flex;
+
+      a {
+        display: none;
+      }
+
+      div {
+        margin: 0 8px;
+
+        strong {
+          font-size: 18px;
+          flex-grow: 1;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+
+      svg {
+        display: none;
+      }
     }
   }
 `;

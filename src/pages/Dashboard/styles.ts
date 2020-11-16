@@ -55,6 +55,31 @@ export const Form = styled.form<FormProps>`
       background: ${shade(0.2, '#04d361')};
     }
   }
+
+  @media only screen and (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      height: 3rem;
+      padding: 0.8rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+
+      ${props =>
+        props.hasError &&
+        css`
+          border-color: #c53030;
+        `}
+    }
+
+    button {
+      border-radius: 5px;
+      height: 3rem;
+      width: 100%;
+    }
+  }
 `;
 
 export const Error = styled.span`
@@ -112,6 +137,31 @@ export const Repositories = styled.div`
     svg {
       margin-left: auto;
       color: #cbcbd6;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    margin-top: 1.5rem;
+
+    a {
+      padding: 0.8rem;
+
+      img {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      div {
+        margin: 0 8px;
+
+        p {
+          font-size: 1rem;
+        }
+      }
+
+      svg {
+        size: 1rem;
+      }
     }
   }
 `;

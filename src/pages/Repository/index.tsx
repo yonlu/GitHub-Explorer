@@ -8,16 +8,17 @@ import {
   GoChevronRight,
 } from 'react-icons/go';
 import api from '../../services/api';
+import Label from '../../components/Label';
 
 import logoImg from '../../assets/logo.svg';
 
-import { Header, RepositoryInfo, Issues } from './styles';
+import { RepositoryContainer, Header, RepositoryInfo, Issues } from './styles';
 
 interface RepositoryParams {
   repository: string;
 }
 
-interface Repository {
+interface RepositoryDTO {
   full_name: string;
   description: string;
   stargazers_count: number;
@@ -37,10 +38,16 @@ interface Issue {
     login: string;
     avatar_url: string;
   };
+  labels: Array<{
+    id: string;
+    url: string;
+    name: string;
+    color: string;
+  }>;
 }
 
 const Repository: React.FC = () => {
-  const [repository, setRepository] = useState<Repository | null>(null);
+  const [repository, setRepository] = useState<RepositoryDTO | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
 
   const { params } = useRouteMatch<RepositoryParams>();
@@ -56,7 +63,7 @@ const Repository: React.FC = () => {
   }, [params.repository]);
 
   return (
-    <>
+    <RepositoryContainer>
       <Header>
         <img src={logoImg} alt="GitHub Explorer" />
         <Link to="/">
@@ -99,7 +106,13 @@ const Repository: React.FC = () => {
 
       <Issues>
         {issues.map(issue => (
-          <a key={issue.id} href={issue.html_url}>
+          <a
+            className="issue"
+            key={issue.id}
+            href={issue.html_url}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             <div>
               <img
                 src={issue.user.avatar_url}
@@ -110,12 +123,21 @@ const Repository: React.FC = () => {
               <strong>{issue.title}</strong>
               <p>{issue.user.login}</p>
             </div>
+            {issue.labels.map(label => (
+              <Label
+                key={label.id}
+                url={`https://github.com/${params.repository}/labels/${label.name}`}
+                name={label.name}
+                color={label.color}
+              />
+            ))}
+            <div />
 
             <GoChevronRight size={20} />
           </a>
         ))}
       </Issues>
-    </>
+    </RepositoryContainer>
   );
 };
 
