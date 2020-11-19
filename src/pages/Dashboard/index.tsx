@@ -10,6 +10,7 @@ import logoImg from '../../assets/logo.svg';
 import { Title, Form, Repositories, Error } from './styles';
 
 interface Repository {
+  id: number;
   full_name: string;
   description: string;
   owner: {
@@ -19,6 +20,20 @@ interface Repository {
 }
 
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [inputError, setInputError] = useState('');
+  const [repositories, setRepositories] = useState<Repository[]>(() => {
+    const storedRepositories = localStorage.getItem(
+      '@GitHubExplorer:repositories',
+    );
+
+    if (storedRepositories) {
+      return JSON.parse(storedRepositories);
+    }
+
+    return [];
+  });
+
   const notifySuccess = () =>
     toast.success('Your repository was added to the list!', {
       position: 'top-center',
@@ -41,19 +56,16 @@ const Dashboard: React.FC = () => {
       progress: undefined,
     });
 
-  const [newRepo, setNewRepo] = useState('');
-  const [inputError, setInputError] = useState('');
-  const [repositories, setRepositories] = useState<Repository[]>(() => {
-    const storedRepositories = localStorage.getItem(
-      '@GitHubExplorer:repositories',
-    );
-
-    if (storedRepositories) {
-      return JSON.parse(storedRepositories);
-    }
-
-    return [];
-  });
+  const notifyDuplicate = () =>
+    toast.info('This repository is already on your list. ', {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
 
   useEffect(() => {
     localStorage.setItem(
@@ -88,6 +100,11 @@ const Dashboard: React.FC = () => {
     }
   }, [repositories]);
 
+  function checkDuplicateRepository(id: number) {
+    const duplicate = repositories.filter(repo => repo.id === id).length;
+    return Boolean(duplicate);
+  }
+
   async function handleAddRepository(
     event: FormEvent<HTMLFormElement>,
   ): Promise<void> {
@@ -105,9 +122,16 @@ const Dashboard: React.FC = () => {
       const response = await api.get<Repository>(`repos/${newRepo}`);
       const repository = response.data;
 
-      setRepositories([...repositories, repository]);
-      setNewRepo('');
-      setInputError('');
+      const isDuplicateRepository = checkDuplicateRepository(repository.id);
+
+      if (isDuplicateRepository) {
+        success = false;
+        notifyDuplicate();
+      } else {
+        setRepositories([...repositories, repository]);
+        setNewRepo('');
+        setInputError('');
+      }
     } catch (err) {
       success = false;
       notifyError();
