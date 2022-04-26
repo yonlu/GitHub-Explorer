@@ -25,7 +25,7 @@ export const Header = styled.header`
 `;
 
 export const RepositoryInfo = styled.section`
-  margin-top: 80px;
+  margin-top: 5rem;
 
   header {
     display: flex;
@@ -115,7 +115,7 @@ export const RepositoryInfo = styled.section`
 `;
 
 export const Issues = styled.div`
-  margin-top: 80px;
+  margin-top: 5rem;
 
   .issue {
     background: #fff;
@@ -133,12 +133,12 @@ export const Issues = styled.div`
       transform: translateX(10px);
     }
 
-    & + a {
-      margin-top: 16px;
+    & + article {
+      margin-top: 1rem;
     }
 
     div {
-      margin: 0 16px;
+      margin: 0 1rem;
 
       strong {
         font-size: 20px;
@@ -188,6 +188,21 @@ export const Issues = styled.div`
 
       svg {
         display: none;
+      }
+    }
+  }
+
+  @media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+    .issue {
+      padding: 0.5rem;
+      div {
+        strong {
+          font-size: 14px;
+        }
+
+        p {
+          font-size: 12px;
+        }
       }
     }
   }
