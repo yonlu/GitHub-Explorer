@@ -5,7 +5,6 @@ import {
   GoRepoForked,
   GoIssueOpened,
   GoChevronLeft,
-  GoChevronRight,
 } from 'react-icons/go';
 import api from '../../services/api';
 import Label from '../../components/Label';
@@ -47,10 +46,20 @@ interface Issue {
 }
 
 const Repository: React.FC = () => {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1450);
   const [repository, setRepository] = useState<RepositoryDTO | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
 
   const { params } = useRouteMatch<RepositoryParams>();
+
+  const updateMedia = () => {
+    setIsDesktop(window.innerWidth > 1450);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', updateMedia);
+    return () => window.removeEventListener('resize', updateMedia);
+  });
 
   useEffect(() => {
     api.get(`repos/${params.repository}`).then(response => {
@@ -58,6 +67,10 @@ const Repository: React.FC = () => {
     });
 
     api.get(`repos/${params.repository}/issues`).then(response => {
+      const allIssues = response.data;
+      allIssues.forEach((issue: Issue) => {
+        issue.labels = issue.labels.slice(0, 3);
+      });
       setIssues(response.data);
     });
   }, [params.repository]);
@@ -103,16 +116,9 @@ const Repository: React.FC = () => {
           </ul>
         </RepositoryInfo>
       )}
-
       <Issues>
         {issues.map(issue => (
-          <a
-            className="issue"
-            key={issue.id}
-            href={issue.html_url}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
+          <article className="issue" key={issue.id}>
             <div>
               <img
                 src={issue.user.avatar_url}
@@ -123,18 +129,17 @@ const Repository: React.FC = () => {
               <strong>{issue.title}</strong>
               <p>{issue.user.login}</p>
             </div>
-            {issue.labels.map(label => (
-              <Label
-                key={label.id}
-                url={`https://github.com/${params.repository}/labels/${label.name}`}
-                name={label.name}
-                color={label.color}
-              />
-            ))}
-            <div />
-
-            <GoChevronRight size={20} />
-          </a>
+            {isDesktop
+              ? issue.labels.map(label => (
+                  <Label
+                    key={label.id}
+                    url={`https://github.com/${params.repository}/labels/${label.name}`}
+                    name={label.name}
+                    color={label.color}
+                  />
+                ))
+              : null}
+          </article>
         ))}
       </Issues>
     </RepositoryContainer>

@@ -1,13 +1,15 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState } from 'react';
 import { GoChevronRight } from 'react-icons/go';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import { useQueries } from 'react-query';
 import api from '../../services/api';
 import 'react-toastify/dist/ReactToastify.css';
 
 import logoImg from '../../assets/logo.svg';
 
-import { Title, Form, Repositories, Error } from './styles';
+import { Title, Repositories } from './styles';
+import { SearchBox } from '../../components/SearchBox';
 
 interface Repository {
   id: number;
@@ -20,126 +22,31 @@ interface Repository {
 }
 
 const Dashboard: React.FC = () => {
-  const [newRepo, setNewRepo] = useState('');
-  const [inputError, setInputError] = useState('');
-  const [repositories, setRepositories] = useState<Repository[]>(() => {
-    const storedRepositories = localStorage.getItem(
-      '@GitHubExplorer:repositories',
-    );
-
-    if (storedRepositories) {
-      return JSON.parse(storedRepositories);
-    }
-
-    return [];
-  });
-
-  const notifySuccess = () =>
-    toast.success('Your repository was added to the list!', {
-      position: 'top-center',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-
-  const notifyError = () =>
-    toast.error('Repository not found.', {
-      position: 'top-center',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-
-  const notifyDuplicate = () =>
-    toast.info('This repository is already on your list. ', {
-      position: 'top-center',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-
-  useEffect(() => {
-    localStorage.setItem(
-      '@GitHubExplorer:repositories',
-      JSON.stringify(repositories),
-    );
-
-    async function setDefaultRepositories(): Promise<void> {
-      const { data: repositoryOne } = await api.get<Repository>(
-        'repos/torvalds/linux',
-      );
-
-      const { data: repositoryTwo } = await api.get<Repository>(
-        'repos/nodejs/node',
-      );
-
-      const { data: repositoryThree } = await api.get<Repository>(
-        'repos/microsoft/typescript',
-      );
-
-      const defaultRepositories: Repository[] = [
-        repositoryOne,
-        repositoryTwo,
-        repositoryThree,
-      ];
-
-      setRepositories(defaultRepositories);
-    }
-
-    if (repositories.length === 0) {
-      setDefaultRepositories();
-    }
-  }, [repositories]);
-
-  function checkDuplicateRepository(id: number) {
-    const duplicate = repositories.filter(repo => repo.id === id).length;
-    return Boolean(duplicate);
+  async function fetchRepository(repoUrl: string): Promise<Repository> {
+    return api.get(repoUrl).then(response => response.data);
   }
 
-  async function handleAddRepository(
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> {
-    event.preventDefault();
+  const [queries] = useState([
+    {
+      queryKey: ['foo', 1],
+      queryFn: () => fetchRepository('repos/torvalds/linux'),
+    },
+    {
+      queryKey: ['foo', 2],
+      queryFn: () => fetchRepository('repos/nodejs/node'),
+    },
+    {
+      queryKey: ['foo', 3],
+      queryFn: () => fetchRepository('repos/microsoft/typescript'),
+    },
+  ]);
 
-    if (!newRepo) {
-      setInputError(
-        'Enter a repository in the following format: user/repository',
-      );
-      return;
-    }
+  const results = useQueries(queries);
 
-    let success = true;
-    try {
-      const response = await api.get<Repository>(`repos/${newRepo}`);
-      const repository = response.data;
+  const isLoading = results.some(result => result.isLoading);
 
-      const isDuplicateRepository = checkDuplicateRepository(repository.id);
-
-      if (isDuplicateRepository) {
-        success = false;
-        notifyDuplicate();
-      } else {
-        setRepositories([...repositories, repository]);
-        setNewRepo('');
-        setInputError('');
-      }
-    } catch (err) {
-      success = false;
-      notifyError();
-      setInputError('Failed to find repository');
-    }
-    if (success) {
-      notifySuccess();
-    }
+  if (isLoading) {
+    return <span>Loading...</span>;
   }
 
   return (
@@ -158,31 +65,21 @@ const Dashboard: React.FC = () => {
       <img src={logoImg} alt="GitHub Explorer" />
       <Title>Explore GitHub repositories</Title>
 
-      <Form hasError={!!inputError} onSubmit={handleAddRepository}>
-        <input
-          value={newRepo}
-          onChange={e => setNewRepo(e.target.value)}
-          placeholder="Enter a repository, e.g., facebook/react"
-          type="text"
-        />
-        <button type="submit">Search</button>
-      </Form>
-
-      {inputError && <Error>{inputError}</Error>}
+      <SearchBox />
 
       <Repositories>
-        {repositories.map(repository => (
+        {results?.map(result => (
           <Link
-            key={repository.full_name}
-            to={`/repositories/${repository.full_name}`}
+            key={result?.data?.full_name}
+            to={`/repositories/${result?.data?.full_name}`}
           >
             <img
-              alt={repository.owner.login}
-              src={repository.owner.avatar_url}
+              alt={result?.data?.owner.login}
+              src={result?.data?.owner.avatar_url}
             />
             <div>
-              <strong>{repository.full_name}</strong>
-              <p>{repository.description}</p>
+              <strong>{result?.data?.full_name}</strong>
+              <p>{result?.data?.description}</p>
             </div>
 
             <GoChevronRight size={20} />
