@@ -156,12 +156,6 @@ export const Issues = styled.div`
       margin-left: auto;
       color: #cbcbd6;
     }
-
-    img {
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-    }
   }
 
   @media only screen and (max-width: 600px) {

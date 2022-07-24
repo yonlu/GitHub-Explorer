@@ -13,37 +13,10 @@ import Label from '../../components/Label';
 import logoImg from '../../assets/logo.svg';
 
 import { RepositoryContainer, Header, RepositoryInfo, Issues } from './styles';
+import { Issue, Repository as RepositoryDTO } from '../../types/interfaces';
 
 interface RepositoryParams {
   repository: string;
-}
-
-interface RepositoryDTO {
-  full_name: string;
-  description: string;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  owner: {
-    login: string;
-    avatar_url: string;
-  };
-}
-
-interface Issue {
-  id: number;
-  title: string;
-  html_url: string;
-  user: {
-    login: string;
-    avatar_url: string;
-  };
-  labels: Array<{
-    id: string;
-    url: string;
-    name: string;
-    color: string;
-  }>;
 }
 
 const Repository: React.FC = () => {
@@ -124,10 +97,11 @@ const Repository: React.FC = () => {
         </RepositoryInfo>
       )}
       <Issues>
-        {issues.map(issue => (
+        {issues?.map(issue => (
           <article className="issue" key={issue.id}>
             <div>
               <img
+                className="inline-block h-16 w-16 rounded-full ring-2 ring-white"
                 src={issue.user.avatar_url}
                 alt={`${issue.user.login} profile`}
               />

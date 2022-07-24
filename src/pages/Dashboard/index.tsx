@@ -10,16 +10,7 @@ import logoImg from '../../assets/logo.svg';
 
 import { Title, Repositories } from './styles';
 import { SearchBox } from '../../components/SearchBox';
-
-interface Repository {
-  id: number;
-  full_name: string;
-  description: string;
-  owner: {
-    login: string;
-    avatar_url: string;
-  };
-}
+import { Repository } from '../../types/interfaces';
 
 const Dashboard: React.FC = () => {
   async function fetchRepository(repoUrl: string): Promise<Repository> {
