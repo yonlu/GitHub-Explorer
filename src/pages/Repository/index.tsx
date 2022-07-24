@@ -6,6 +6,7 @@ import {
   GoIssueOpened,
   GoChevronLeft,
 } from 'react-icons/go';
+import { useQuery } from 'react-query';
 import api from '../../services/api';
 import Label from '../../components/Label';
 
@@ -47,8 +48,6 @@ interface Issue {
 
 const Repository: React.FC = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1450);
-  const [repository, setRepository] = useState<RepositoryDTO | null>(null);
-  const [issues, setIssues] = useState<Issue[]>([]);
 
   const { params } = useRouteMatch<RepositoryParams>();
 
@@ -61,19 +60,27 @@ const Repository: React.FC = () => {
     return () => window.removeEventListener('resize', updateMedia);
   });
 
-  useEffect(() => {
-    api.get(`repos/${params.repository}`).then(response => {
-      setRepository(response.data);
-    });
+  async function fetchRepository(): Promise<RepositoryDTO> {
+    return api
+      .get(`repos/${params.repository}`)
+      .then(response => response.data);
+  }
 
-    api.get(`repos/${params.repository}/issues`).then(response => {
-      const allIssues = response.data;
-      allIssues.forEach((issue: Issue) => {
-        issue.labels = issue.labels.slice(0, 3);
-      });
-      setIssues(response.data);
-    });
-  }, [params.repository]);
+  async function fetchIssues(): Promise<Issue[]> {
+    return api
+      .get(`repos/${params.repository}/issues`)
+      .then(response => response.data);
+  }
+
+  const { data: repository, isLoading: isLoadingRepo } = useQuery(
+    'repo',
+    fetchRepository,
+  );
+  const { data: issues, isLoading } = useQuery('issues', fetchIssues);
+
+  if (isLoading && isLoadingRepo) {
+    return <span>Loading...</span>;
+  }
 
   return (
     <RepositoryContainer>
