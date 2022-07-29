@@ -99,17 +99,19 @@ const Repository: React.FC = () => {
       <Issues>
         {issues?.map(issue => (
           <article className="issue" key={issue.id}>
-            <div>
-              <img
-                className="inline-block h-16 w-16 rounded-full ring-2 ring-white"
-                src={issue.user.avatar_url}
-                alt={`${issue.user.login} profile`}
-              />
-            </div>
-            <div>
-              <strong>{issue.title}</strong>
-              <p>{issue.user.login}</p>
-            </div>
+            <a href={issue.html_url} className="flex gap-[1rem] items-center">
+              <div>
+                <img
+                  className="inline-block h-[2rem] w-[2rem] rounded-full ring-2 ring-white"
+                  src={issue.user.avatar_url}
+                  alt={`${issue.user.login} profile`}
+                />
+              </div>
+              <div>
+                <strong>{issue.title}</strong>
+                <p>{issue.user.login}</p>
+              </div>
+            </a>
             {isDesktop
               ? issue.labels.map(label => (
                   <Label
