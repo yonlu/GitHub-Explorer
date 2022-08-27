@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import {
   GoStar,
@@ -6,74 +6,29 @@ import {
   GoIssueOpened,
   GoChevronLeft,
 } from 'react-icons/go';
-import api from '../../services/api';
-import Label from '../../components/Label';
 
 import logoImg from '../../assets/logo.svg';
-
 import { RepositoryContainer, Header, RepositoryInfo, Issues } from './styles';
+import { useIssuesQuery } from '../../hooks/useIssues';
+import { useRepositoryQuery } from '../../hooks/useRepository';
 
 interface RepositoryParams {
   repository: string;
 }
 
-interface RepositoryDTO {
-  full_name: string;
-  description: string;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  owner: {
-    login: string;
-    avatar_url: string;
-  };
-}
-
-interface Issue {
-  id: number;
-  title: string;
-  html_url: string;
-  user: {
-    login: string;
-    avatar_url: string;
-  };
-  labels: Array<{
-    id: string;
-    url: string;
-    name: string;
-    color: string;
-  }>;
-}
-
 const Repository: React.FC = () => {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1450);
-  const [repository, setRepository] = useState<RepositoryDTO | null>(null);
-  const [issues, setIssues] = useState<Issue[]>([]);
-
   const { params } = useRouteMatch<RepositoryParams>();
 
-  const updateMedia = () => {
-    setIsDesktop(window.innerWidth > 1450);
-  };
+  const { data: repository, isLoading: isLoadingRepo } = useRepositoryQuery(
+    params.repository,
+  );
 
-  useEffect(() => {
-    window.addEventListener('resize', updateMedia);
-    return () => window.removeEventListener('resize', updateMedia);
-  });
+  const { data: issues, isLoading } = useIssuesQuery(params.repository);
 
-  useEffect(() => {
-    api.get(`repos/${params.repository}`).then(response => {
-      setRepository(response.data);
-    });
+  if (isLoading && isLoadingRepo) {
+    return <span>Loading...</span>;
+  }
 
-    api.get(`repos/${params.repository}/issues`).then(response => {
-      const allIssues = response.data;
-      allIssues.forEach((issue: Issue) => {
-        issue.labels = issue.labels.slice(0, 3);
-      });
-      setIssues(response.data);
-    });
-  }, [params.repository]);
 
   return (
     <RepositoryContainer>
@@ -117,28 +72,21 @@ const Repository: React.FC = () => {
         </RepositoryInfo>
       )}
       <Issues>
-        {issues.map(issue => (
+        {issues?.map(issue => (
           <article className="issue" key={issue.id}>
-            <div>
-              <img
-                src={issue.user.avatar_url}
-                alt={`${issue.user.login} profile`}
-              />
-            </div>
-            <div>
-              <strong>{issue.title}</strong>
-              <p>{issue.user.login}</p>
-            </div>
-            {isDesktop
-              ? issue.labels.map(label => (
-                  <Label
-                    key={label.id}
-                    url={`https://github.com/${params.repository}/labels/${label.name}`}
-                    name={label.name}
-                    color={label.color}
-                  />
-                ))
-              : null}
+            <a href={issue.html_url} className="flex gap-[1rem] items-center">
+              <div>
+                <img
+                  className="inline-block h-[2rem] w-[2rem] rounded-full ring-2 ring-white"
+                  src={issue.user.avatar_url}
+                  alt={`${issue.user.login} profile`}
+                />
+              </div>
+              <div>
+                <strong>{issue.title}</strong>
+                <p>{issue.user.login}</p>
+              </div>
+            </a>
           </article>
         ))}
       </Issues>

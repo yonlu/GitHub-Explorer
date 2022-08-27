@@ -121,7 +121,7 @@ export const Issues = styled.div`
     background: #fff;
     border-radius: 5px;
     width: 100%;
-    padding: 24px;
+    padding: 1.5rem;
     display: block;
     text-decoration: none;
 
@@ -137,30 +137,22 @@ export const Issues = styled.div`
       margin-top: 1rem;
     }
 
-    div {
-      margin: 0 1rem;
+    a {
+      div {
+        width: fit-content;
+        height: fit-content;
 
-      strong {
-        font-size: 20px;
-        color: #3d3d4d;
+        strong {
+          font-size: 20px;
+          color: #3d3d4d;
+        }
+
+        p {
+          font-size: 18px;
+          color: #a8a8b3;
+          margin-top: 4px;
+        }
       }
-
-      p {
-        font-size: 18px;
-        color: #a8a8b3;
-        margin-top: 4px;
-      }
-    }
-
-    svg {
-      margin-left: auto;
-      color: #cbcbd6;
-    }
-
-    img {
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
     }
   }
 
@@ -169,15 +161,9 @@ export const Issues = styled.div`
       padding: 12px;
       display: flex;
 
-      a {
-        display: none;
-      }
-
       div {
-        margin: 0 8px;
-
         strong {
-          font-size: 18px;
+          font-size: 14px;
           flex-grow: 1;
         }
 
@@ -195,13 +181,16 @@ export const Issues = styled.div`
   @media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
     .issue {
       padding: 0.5rem;
-      div {
-        strong {
-          font-size: 14px;
-        }
 
-        p {
-          font-size: 12px;
+      a {
+        div {
+          strong {
+            font-size: 14px;
+          }
+
+          p {
+            font-size: 12px;
+          }
         }
       }
     }
