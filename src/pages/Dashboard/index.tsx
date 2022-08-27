@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { GoChevronRight } from 'react-icons/go';
 import { Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import { useQueries } from 'react-query';
 import api from '../../services/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,17 +41,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
       <img src={logoImg} alt="GitHub Explorer" />
       <Title>Explore GitHub repositories</Title>
 

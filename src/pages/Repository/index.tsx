@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import {
   GoStar,
@@ -6,50 +6,24 @@ import {
   GoIssueOpened,
   GoChevronLeft,
 } from 'react-icons/go';
-import { useQuery } from 'react-query';
-import api from '../../services/api';
-import Label from '../../components/Label';
 
 import logoImg from '../../assets/logo.svg';
-
 import { RepositoryContainer, Header, RepositoryInfo, Issues } from './styles';
-import { Issue, Repository as RepositoryDTO } from '../../types/interfaces';
+import { useIssuesQuery } from '../../hooks/useIssues';
+import { useRepositoryQuery } from '../../hooks/useRepository';
 
 interface RepositoryParams {
   repository: string;
 }
 
 const Repository: React.FC = () => {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1450);
-
   const { params } = useRouteMatch<RepositoryParams>();
 
-  const updateMedia = () => {
-    setIsDesktop(window.innerWidth > 1450);
-  };
-
-  useEffect(() => {
-    window.addEventListener('resize', updateMedia);
-    return () => window.removeEventListener('resize', updateMedia);
-  });
-
-  async function fetchRepository(): Promise<RepositoryDTO> {
-    return api
-      .get(`repos/${params.repository}`)
-      .then(response => response.data);
-  }
-
-  async function fetchIssues(): Promise<Issue[]> {
-    return api
-      .get(`repos/${params.repository}/issues`)
-      .then(response => response.data);
-  }
-
-  const { data: repository, isLoading: isLoadingRepo } = useQuery(
-    'repo',
-    fetchRepository,
+  const { data: repository, isLoading: isLoadingRepo } = useRepositoryQuery(
+    params.repository,
   );
-  const { data: issues, isLoading } = useQuery('issues', fetchIssues);
+
+  const { data: issues, isLoading } = useIssuesQuery(params.repository);
 
   if (isLoading && isLoadingRepo) {
     return <span>Loading...</span>;
@@ -112,16 +86,6 @@ const Repository: React.FC = () => {
                 <p>{issue.user.login}</p>
               </div>
             </a>
-            {isDesktop
-              ? issue.labels.map(label => (
-                  <Label
-                    key={label.id}
-                    url={`https://github.com/${params.repository}/labels/${label.name}`}
-                    name={label.name}
-                    color={label.color}
-                  />
-                ))
-              : null}
           </article>
         ))}
       </Issues>
